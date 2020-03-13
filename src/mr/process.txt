@@ -1,0 +1,33 @@
+mrmaster.go starts master
+mrworker.go starts workers
+Workers send request to master, ask for task. Either a map task or a reduce task
+can be assigned by the master. Some attribute in the reply help the worker to
+tell what kind of task it gets assigned.
+The Map function (mapf) would return the whole intermediate result, i.e., an 
+entire row in the picture. The map worker is responsible for dividing the
+result into nReduce buckets, stored as mr-X-Y. Where X is the map task number
+and Y is the reduce task number. (From this, we know that map task number should
+also be sent from the master to the worker).
+After the map task is done, some reply should be sent back to master to signal
+the end.
+Master waits until all map tasks to finish before scheduling reduce tasks to 
+workers again. During the mean time, idle workers need to wait.
+Each reduce worker should be given the information of finding the finding
+intermediate files. Note that each reduce worker would need to have multiple
+intermediate files. For example, reduce worker 1 would need mr-1-1, mr-2-1, 
+mr-3-1, ...
+Reduce worker puts these files together, sort the result, and run the Reduce
+function (reducef) on each unique key.
+
+The master needs some way to keep track of the map tasks and reduce tasks. All 
+following discussions ignore efficiency.
+Given the list of file names, master creates two map[string]int, each one
+tracking the state of map/reduce tasks.
+When receiving the request for a job from worker, master scans through the
+list of map tasks to find if there's any unfinished task. If yes, send the
+file name and the index to the server. The file name enables the worker to 
+fetch the input and the index enables the worker to save the intermediate
+result to a file. There are three states for each task: unassigned, 
+assigned but still working, finished. After each task is finished, the worker
+should notify the master.
+Reduce tasks can be managed in the same way.
