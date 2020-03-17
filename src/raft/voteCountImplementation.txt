@@ -1,0 +1,163 @@
+Original implementation
+
+```
+var wg sync.WaitGroup
+for i := 0; i < len(rf.peers); i++ {
+    if i == rf.me {
+        continue
+    }
+
+    lastLogIndex := len(rf.log) - 1
+    lastLogTerm := -1
+    if lastLogIndex >= 0 {
+        lastLogTerm = rf.log[lastLogIndex].ReceivedTerm
+    }
+    wg.Add(1)
+    // Have to use argument passing. Refer to Rule 5 of
+    // https://pdos.csail.mit.edu/6.824/labs/raft-locking.txt
+    go func(sender int, server int, currentTerm int, me int, lastLogIndex int, lastLogTerm int) {
+        args := RequestVoteArgs{
+            Term:         currentTerm,
+            CandidateID:  me,
+            LastLogIndex: lastLogIndex,
+            LastLogterm:  lastLogTerm,
+        }
+        reply := RequestVoteReply{}
+        ok := rf.sendRequestVote(server, &args, &reply) // could block
+
+        if ok {
+            rf.mu.Lock()
+            // Term confusion in the student's guide
+            if rf.currentTerm != currentTerm {
+                // Compare currentTerm with sent term
+                // if different, drop reply and return without processing old reply
+                wg.Done()
+                rf.mu.Unlock()
+                return
+            }
+            // Only if the two terms are the same, contine processing
+            rf.becomesFollowerIfOutOfTerm(reply.Term)
+            if rf.serverState == candidate && reply.VoteGranted {
+                rf.votesReceived++
+            }
+            rf.mu.Unlock()
+        }
+        wg.Done()
+    }(rf.me, i, rf.currentTerm, rf.me, lastLogIndex, lastLogTerm)
+}
+
+termBeforeWait := rf.currentTerm // Used for checking after waiting
+// DPrintf("Candidate %v finished creating go routine for sending out RequestVote, start waiting", rf.me)
+
+rf.mu.Unlock() // Release the lock before waiting
+wg.Wait() // Wait until all RequestVotes return, could block
+rf.mu.Lock()
+
+// Must recheck all assumptions after re-acquiring the lock
+DPrintf("%v finishes waiting, votesReceived: %v\n", rf.me, rf.votesReceived)
+if rf.serverState == candidate && // Still a candidate
+    rf.currentTerm == termBeforeWait && // Term has not changed
+    rf.votesReceived >= rf.minMajority {
+
+    // Become leader, need to initialize leader-only server states
+    // as not done in Make()
+    rf.serverState = leader
+    DPrintf("%v Becomes leader! ", rf.me)
+    rf.nextIndex = make([]int, len(rf.peers))
+    for i := range rf.nextIndex {
+        rf.nextIndex[i] = len(rf.log) // Initialized to leader last log index + 1
+    }
+    rf.matchIndex = make([]int, len(rf.peers))
+    for i := range rf.matchIndex {
+        rf.matchIndex[i] = 0 // Initialized to 0
+    }
+}
+```
+
+Implementation that passes the test:
+
+```
+for i := 0; i < len(rf.peers); i++ {
+    if i == rf.me {
+        continue
+    }
+
+    lastLogIndex := len(rf.log) - 1
+    lastLogTerm := -1
+    if lastLogIndex >= 0 {
+        lastLogTerm = rf.log[lastLogIndex].ReceivedTerm
+    }
+    args := RequestVoteArgs{
+        Term:         rf.currentTerm,
+        CandidateID:  rf.me,
+        LastLogIndex: lastLogIndex,
+        LastLogterm:  lastLogTerm,
+    }
+
+    go func(server int, args RequestVoteArgs) {
+        reply := RequestVoteReply{}
+        ok := rf.sendRequestVote(server, &args, &reply) // could block
+
+        rf.mu.Lock()
+        if ok {
+            if rf.currentTerm != args.Term { // Term confusion in the student's guide
+                return
+            }
+            // Only if the two terms are the same, contine processing
+            rf.becomesFollowerIfOutOfTerm(reply.Term)
+            if rf.serverState == candidate && reply.VoteGranted {
+                rf.votesReceived++
+                if rf.votesReceived >= rf.minMajority {
+                    rf.serverState = leader
+                    DPrintf("%v Becomes leader! ", rf.me)
+
+                    // Initialize leader-only server state
+                    rf.nextIndex = make([]int, len(rf.peers))
+                    for i := range rf.nextIndex {
+                        rf.nextIndex[i] = len(rf.log) // Initialized to leader last log index + 1
+                    }
+                    rf.matchIndex = make([]int, len(rf.peers))
+                    for i := range rf.matchIndex {
+                        rf.matchIndex[i] = 0 // Initialized to 0
+                    }
+                }
+            }
+        }
+        rf.mu.Unlock()
+    }(i, args)
+}
+```
+
+Difference between the two implementations
+
+The 1st implementaion uses sync.WaitGroup. After creating go routines to
+send RequestVote RPC calls, it releases the lock and waits. When all go routines
+finishes, re-acquires the lock and checks if convert to leader.
+    The second implementaion does not wait until all results are received, nor
+does it do the checking in eletionTimeout(). Instead, each time when a new vote 
+result is generated, the go routine itself checks if convert to leader.
+    Thus, the 2nd implementation seems less complicated, though 1st implementation
+does not seem to be wrong. However, the observation from the logging is that
+in the 1st implementation, the threads keeps busy sending RequestVote but does
+not have time to execute the RequestVote handler. This results in servers keeps
+re-starting elections as candidates (logging would look like below:)
+
+2020/03/17 15:50:54 1 Becomes candidate at election timeout ## rf.currentTerm: 10 -> 11 
+2020/03/17 15:50:54 1 finishes waiting, votesReceived: 1
+2020/03/17 15:50:54 0 Becomes candidate at election timeout ## rf.currentTerm: 9 -> 10 
+2020/03/17 15:50:54 0 finishes waiting, votesReceived: 1
+2020/03/17 15:50:54 1 Becomes candidate at election timeout ## rf.currentTerm: 11 -> 12 
+2020/03/17 15:50:54 1 finishes waiting, votesReceived: 1
+2020/03/17 15:50:55 0 Becomes candidate at election timeout ## rf.currentTerm: 10 -> 11 
+2020/03/17 15:50:55 0 finishes waiting, votesReceived: 1
+2020/03/17 15:50:55 1 Becomes candidate at election timeout ## rf.currentTerm: 12 -> 13 
+2020/03/17 15:50:55 1 finishes waiting, votesReceived: 1
+2020/03/17 15:50:55 0 Becomes candidate at election timeout ## rf.currentTerm: 11 -> 12 
+2020/03/17 15:50:55 0 finishes waiting, votesReceived: 1
+2020/03/17 15:50:55 1 Becomes candidate at election timeout ## rf.currentTerm: 13 -> 14
+
+This again matches the advice in Raft Structure Advice of "Each RPC should 
+probably be sent (and its reply processed) in its own goroutine ... It's easiest 
+to do the RPC reply processing in the same goroutine, rather than sending
+reply information over a channel.". Keep this in mind! Do the RPC reply processing
+in the same go routine!
