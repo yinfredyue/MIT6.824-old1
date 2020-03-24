@@ -1,0 +1,128 @@
+Raft Locking Advice
+https://pdos.csail.mit.edu/6.824/labs/raft-locking.txt
+
+1. Lock is used to avoid concurrent modification to shared data.
+
+2. Lock can make access to shared data as atomatic and thus preserve the
+invariant. In other words, if you have any operation that could temporaritly,
+you should use the lock to make those operations atomatic.
+
+3. It's usually a bad idea to hold a lock while doing anything
+that might wait: reading a Go channel, sending on a channel, waiting
+for a timer, calling time.Sleep(), or sending an RPC (and waiting for the
+reply). One reason is that you probably want other goroutines to make
+progress during the wait. Another reason is deadlock avoidance. Imagine
+two peers sending each other RPCs while holding locks; both RPC
+handlers need the receiving peer's lock; neither RPC handler can ever
+complete because it needs the lock held by the waiting RPC call.
+
+Code that waits should first release locks. If that's not convenient,
+sometimes it's useful to create a separate goroutine to do the operation that
+could wait.
+
+4. Be careful about assumptions across a drop and re-acquire of a
+lock. One place this can arise is when avoiding waiting with locks
+held. For example, this code to send vote RPCs is incorrect:
+
+  rf.mu.Lock()
+  rf.currentTerm += 1
+  rf.state = Candidate
+  for <each peer> {
+    go func() {
+      rf.mu.Lock()
+      args.Term = rf.currentTerm
+      rf.mu.Unlock()
+      Call("Raft.RequestVote", &args, ...)
+      // handle the reply...
+    } ()
+  }
+  rf.mu.Unlock()
+
+The code sends each RPC in a separate goroutine. It's incorrect
+because args.Term may not be the same as the rf.currentTerm at which
+the surrounding code decided to become a Candidate. Lots of time may
+pass between when the surrounding code creates the goroutine and when
+the goroutine reads rf.currentTerm; for example, multiple terms may
+come and go, and the peer may no longer be a candidate. One way to fix
+this is for the created goroutine to use a copy of rf.currentTerm made
+while the outer code holds the lock. 
+Similarly, reply-handling code after the Call() must re-check all relevant 
+assumptions after re-acquiring the lock; for example, it should check that
+rf.currentTerm hasn't changed since the decision to become a
+candidate.
+
+One approach is to start with code that has no locks, and think
+carefully about where one needs to add locks to attain correctness.
+This approach can be difficult since it requires reasoning about the
+correctness of concurrent code.
+
+A more pragmatic approach starts with the observation that if there
+were no concurrency (no simultaneously executing goroutines), you
+would not need locks at all. But you have concurrency forced on you
+when the RPC system creates goroutines to execute RPC handlers, and
+because you need to send RPCs in separate goroutines to avoid waiting.
+You can effectively eliminate this concurrency by identifying all
+places where goroutines start (RPC handlers, background goroutines you
+create in Make(), &c), acquiring the lock at the very start of each
+goroutine, and only releasing the lock when that goroutine has
+completely finished and returns. This locking protocol ensures that
+nothing significant ever executes in parallel; the locks ensure that
+each goroutine executes to completion before any other goroutine is
+allowed to start. With no parallel execution, it's hard to violate
+Rules 1, 2, 3, or 5. If each goroutine's code is correct in isolation
+(when executed alone, with no concurrent goroutines), it's likely to
+still be correct when you use locks to suppress concurrency. So you
+can avoid explicit reasoning about correctness, or explicitly
+identifying critical sections.
+
+However, Rule 4 is likely to be a problem. So the next step is to find
+places where the code waits, and to add lock releases and re-acquires
+(and/or goroutine creation) as needed, being careful to re-establish
+assumptions after each re-acquire. You may find this process easier to
+get right than directly identifying sequences that must be locked for
+correctness.
+
+(As an aside, what this approach sacrifices is any opportunity for
+better performance via parallel execution on multiple cores: your code
+is likely to hold locks when it doesn't need to, and may thus
+unnecessarily prohibit parallel execution of goroutines. On the other
+hand, there is not much opportunity for CPU parallelism within a
+single Raft peer.)
+
+
+
+Raft Structure Advice
+https://pdos.csail.mit.edu/6.824/labs/raft-structure.txt
+
+1. [X] For the two time-driven activities: heartbeat and election timeout.
+It's probably best to drive each of them with a dedicated long-run goroutine,
+rather than combining multiple activities into a single goroutine.
+
+2. [X] It's also better to have a separate long-running goroutine that sends
+committed log entries in order on the applyCh. It must be separate,
+since sending on the applyCh can block; and it must be a single
+goroutine, since otherwise it may be hard to ensure that you send log
+entries in log order. The code that advances commitIndex will need to
+kick the apply goroutine; it's probably easiest to use a condition
+variable (Go's sync.Cond) for this.
+Usage of sync.Cond:
+https://kaviraj.me/understanding-condition-variable-in-go/
+sync.Cond releases the lock when the thread is descheduled and automatically
+acquires the lock when another go routine wakes it up
+
+3. [X] Each RPC should probably be sent (and its reply processed) in its own
+goroutine, for two reasons: so that unreachable peers don't delay the
+collection of a majority of replies, and so that the heartbeat and
+election timers can continue to tick at all times. It's easiest to do
+the RPC reply processing in the same goroutine, rather than sending
+reply information over a channel.
+
+4. [X] The network can delay, reorder RPCs and RPC replies.
+Figure 2 is pretty good about pointing out places where RPC
+handlers have to be careful about this (e.g. an RPC handler should
+ignore RPCs with old terms). Figure 2 is not always explicit about RPC
+reply processing. The leader has to be careful when processing
+replies; it must check that the term hasn't changed since sending the
+RPC, and must account for the possibility that replies from concurrent
+RPCs to the same follower have changed the leader's state (e.g.
+nextIndex).

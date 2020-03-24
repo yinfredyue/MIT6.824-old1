@@ -1,0 +1,251 @@
+Running tool: /usr/local/go/bin/go test -timeout 30s -run ^(TestBasicAgree2B)$
+
+2020/03/23 15:01:38 0 Starts out as follower! 
+2020/03/23 15:01:38 1 Starts out as follower! 
+2020/03/23 15:01:38 2 Starts out as follower! 
+Test (2B): basic agreement ...
+2020/03/23 15:01:38 1 Becomes candidate at election timeout. rf.currentTerm: 0 -> 1 
+2020/03/23 15:01:38 0 Becomes candidate at election timeout. rf.currentTerm: 0 -> 1 
+2020/03/23 15:01:38 2 Becomes follower as being out of term!  rf.currentTerm: 0 -> 1
+2020/03/23 15:01:38 2 receives RequestVote from 1: granted
+2020/03/23 15:01:38 RequestVote args: {Term: 1, CandidateID: 1, LsatLogIndex: 0, LastLogTerm: 0}
+2020/03/23 15:01:38 1 receives RequestVote from 0: not granted as follower already voted, or candidate's log less up-to-date
+2020/03/23 15:01:38 RequestVote args: {Term: 1, CandidateID: 0, LsatLogIndex: 0, LastLogTerm: 0}
+2020/03/23 15:01:38 1 Becomes leader! 
+2020/03/23 15:01:38   log matches at prevLogIndex
+2020/03/23 15:01:38 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:38 2 receives RequestVote from 0: granted
+2020/03/23 15:01:38 RequestVote args: {Term: 1, CandidateID: 0, LsatLogIndex: 0, LastLogTerm: 0}
+2020/03/23 15:01:38 Log replication in progress..
+2020/03/23 15:01:38 0 Becomes leader! 
+2020/03/23 15:01:38 Server 0 (leader) started, index = 1, term = 1
+2020/03/23 15:01:38 0 is leader, command submitted
+
+Problem: 0 is taken as leader, but later step down due to leader 1. However, the
+request is only send to 0 but not 1 any more.
+Solution: change the start&end of periodicHeartbeatRoutine() to start sending
+heartbeat immediately after becoming leader.
+
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 0 receives RequestVote from 1: not granted as follower already voted, or candidate's log less up-to-date
+2020/03/23 15:01:38 RequestVote args: {Term: 1, CandidateID: 1, LsatLogIndex: 0, LastLogTerm: 0}
+2020/03/23 15:01:38   log matches at prevLogIndex
+2020/03/23 15:01:38 0 becomes follower because of receiving AppendEntries from current leader 1
+2020/03/23 15:01:38 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 Log replication in progress..
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38   log matches at prevLogIndex
+2020/03/23 15:01:38 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:38   log matches at prevLogIndex
+2020/03/23 15:01:38 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:38 Log replication in progress..
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 Log replication in progress..
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 Log replication in progress..
+2020/03/23 15:01:38   log matches at prevLogIndex
+2020/03/23 15:01:38 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:38   log matches at prevLogIndex
+2020/03/23 15:01:38 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 Log replication in progress..
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 Log replication in progress..
+2020/03/23 15:01:38   log matches at prevLogIndex
+2020/03/23 15:01:38 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:38   log matches at prevLogIndex
+2020/03/23 15:01:38 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 Log replication in progress..
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 Log replication in progress..
+2020/03/23 15:01:38   log matches at prevLogIndex
+2020/03/23 15:01:38 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:38   log matches at prevLogIndex
+2020/03/23 15:01:38 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 Log replication in progress..
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 Log replication in progress..
+2020/03/23 15:01:38   log matches at prevLogIndex
+2020/03/23 15:01:38 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:38   log matches at prevLogIndex
+2020/03/23 15:01:38 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 Log replication in progress..
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:38 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 Log replication in progress..
+2020/03/23 15:01:39   log matches at prevLogIndex
+2020/03/23 15:01:39   log matches at prevLogIndex
+2020/03/23 15:01:39 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:39 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 Log replication in progress..
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 Log replication in progress..
+2020/03/23 15:01:39   log matches at prevLogIndex
+2020/03/23 15:01:39 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:39   log matches at prevLogIndex
+2020/03/23 15:01:39 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 Log replication in progress..
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 Log replication in progress..
+2020/03/23 15:01:39   log matches at prevLogIndex
+2020/03/23 15:01:39 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:39   log matches at prevLogIndex
+2020/03/23 15:01:39 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 Log replication in progress..
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 Log replication in progress..
+2020/03/23 15:01:39   log matches at prevLogIndex
+2020/03/23 15:01:39   log matches at prevLogIndex
+2020/03/23 15:01:39 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:39 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 Log replication in progress..
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 Log replication in progress..
+2020/03/23 15:01:39   log matches at prevLogIndex
+2020/03/23 15:01:39 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:39   log matches at prevLogIndex
+2020/03/23 15:01:39 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 Log replication in progress..
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39   log matches at prevLogIndex
+2020/03/23 15:01:39 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:39 Log replication in progress..
+2020/03/23 15:01:39   log matches at prevLogIndex
+2020/03/23 15:01:39 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 Log replication in progress..
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 Log replication in progress..
+2020/03/23 15:01:39   log matches at prevLogIndex
+2020/03/23 15:01:39 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:39   log matches at prevLogIndex
+2020/03/23 15:01:39 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 Log replication in progress..
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 Log replication in progress..
+2020/03/23 15:01:39   log matches at prevLogIndex
+2020/03/23 15:01:39 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:39   log matches at prevLogIndex
+2020/03/23 15:01:39 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 Log replication in progress..
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 Log replication in progress..
+2020/03/23 15:01:39   log matches at prevLogIndex
+2020/03/23 15:01:39 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:39   log matches at prevLogIndex
+2020/03/23 15:01:39 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 Log replication in progress..
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 Log replication in progress..
+2020/03/23 15:01:39   log matches at prevLogIndex
+2020/03/23 15:01:39 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:39   log matches at prevLogIndex
+2020/03/23 15:01:39 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:39 Log replication in progress..
+2020/03/23 15:01:39 == one detects number of commits = 0
+2020/03/23 15:01:40 == one detects number of commits = 0
+2020/03/23 15:01:40 Log replication in progress..
+2020/03/23 15:01:40 == one detects number of commits = 0
+2020/03/23 15:01:40   log matches at prevLogIndex
+2020/03/23 15:01:40 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:40   log matches at prevLogIndex
+2020/03/23 15:01:40 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:40 == one detects number of commits = 0
+2020/03/23 15:01:40 == one detects number of commits = 0
+2020/03/23 15:01:40 Log replication in progress..
+2020/03/23 15:01:40 == one detects number of commits = 0
+2020/03/23 15:01:40 == one detects number of commits = 0
+2020/03/23 15:01:40 Log replication in progress..
+2020/03/23 15:01:40   log matches at prevLogIndex
+2020/03/23 15:01:40 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:40   log matches at prevLogIndex
+2020/03/23 15:01:40 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:40 == one detects number of commits = 0
+2020/03/23 15:01:40 == one detects number of commits = 0
+2020/03/23 15:01:40 == one detects number of commits = 0
+2020/03/23 15:01:40 Log replication in progress..
+2020/03/23 15:01:40 == one detects number of commits = 0
+2020/03/23 15:01:40 == one detects number of commits = 0
+2020/03/23 15:01:40 Log replication in progress..
+2020/03/23 15:01:40   log matches at prevLogIndex
+2020/03/23 15:01:40 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:40   log matches at prevLogIndex
+2020/03/23 15:01:40 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:40 == one detects number of commits = 0
+2020/03/23 15:01:40 == one detects number of commits = 0
+2020/03/23 15:01:40 == one detects number of commits = 0
+2020/03/23 15:01:40 Log replication in progress..
+2020/03/23 15:01:40 == one detects number of commits = 0
+2020/03/23 15:01:40 == one detects number of commits = 0
+2020/03/23 15:01:40 Log replication in progress..
+2020/03/23 15:01:40   log matches at prevLogIndex
+2020/03/23 15:01:40 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:40   log matches at prevLogIndex
+2020/03/23 15:01:40 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 15:01:40 == one detects number of commits = 0
+2020/03/23 15:01:40 == one detects number of commits = 0
+2020/03/23 15:01:40 == one detects number of commits = 0
+2020/03/23 15:01:40 Log replication in progress..
+2020/03/23 15:01:40 == one detects number of commits = 0
+--- FAIL: TestBasicAgree2B (2.01s)
+    /mnt/c/Users/musicman/Desktop/MIT6.824/lab/src/raft/config.go:475: one(100) failed to reach agreement
+FAIL
+exit status 1
+FAIL	_/mnt/c/Users/musicman/Desktop/MIT6.824/lab/src/raft	2.014s
+Error: Tests failed.

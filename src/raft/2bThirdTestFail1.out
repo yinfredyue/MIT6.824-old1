@@ -1,0 +1,445 @@
+Running tool: /usr/local/go/bin/go test -timeout 30s -run ^(TestFailAgree2B)$
+
+2020/03/23 20:01:56 0 Starts out as follower! 
+2020/03/23 20:01:56 1 Starts out as follower! 
+2020/03/23 20:01:56 2 Starts out as follower! 
+Test (2B): agreement despite follower disconnection ...
+2020/03/23 20:01:56 TESTACTION: Try to reach agreement on 101 with 3 servers
+2020/03/23 20:01:56 1 Becomes candidate at election timeout. rf.currentTerm: 0 -> 1 
+2020/03/23 20:01:56 0 Becomes candidate at election timeout. rf.currentTerm: 0 -> 1 
+2020/03/23 20:01:56 2 Becomes candidate at election timeout. rf.currentTerm: 0 -> 1 
+2020/03/23 20:01:57 2 Becomes candidate at election timeout. rf.currentTerm: 1 -> 2 
+2020/03/23 20:01:57 1 Becomes candidate at election timeout. rf.currentTerm: 1 -> 2 
+2020/03/23 20:01:57 0 Becomes follower as being out of term!  rf.currentTerm: 1 -> 2
+2020/03/23 20:01:57 
+
+2 Becomes leader!
+
+2020/03/23 20:01:57 logReplication acquires lock!
+2020/03/23 20:01:57 periodicHeartbeat acquires lock!
+2020/03/23 20:01:57 periodicHeartbeat acquires lock!
+2020/03/23 20:01:57 Server 1 receives heartbeat from 2
+2020/03/23 20:01:57   log matches at prevLogIndex
+2020/03/23 20:01:57 1 becomes follower because of receiving AppendEntries from current leader 2
+2020/03/23 20:01:57 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 20:01:57 Server 0 receives heartbeat from 2
+2020/03/23 20:01:57   log matches at prevLogIndex
+2020/03/23 20:01:57 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 20:01:57 Server 2 (leader) get new command. {index = 1, command = 101}
+2020/03/23 20:01:57 TESTACTION: 2 is leader, submit command
+2020/03/23 20:01:57 periodicHeartbeat acquires lock!
+2020/03/23 20:01:57 periodicHeartbeat acquires lock!
+2020/03/23 20:01:57 periodicHeartbeat acquires lock!
+2020/03/23 20:01:57 Server 0 receives heartbeat from 2
+2020/03/23 20:01:57   log matches at prevLogIndex
+2020/03/23 20:01:57 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 20:01:57 Server 1 receives heartbeat from 2
+2020/03/23 20:01:57   log matches at prevLogIndex
+2020/03/23 20:01:57 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 20:01:57 periodicHeartbeat acquires lock!
+2020/03/23 20:01:57 logReplication acquires lock!
+2020/03/23 20:01:57 logReplicationRoutine: send AppendEntries from 2 to 0
+2020/03/23 20:01:57 logReplicationRoutine: send AppendEntries from 2 to 1
+2020/03/23 20:01:57 Server 2 sends AppendEntries to 1 for log replication
+2020/03/23 20:01:57 Server 2 sends AppendEntries to 0 for log replication
+2020/03/23 20:01:57 Server 1 receives AppendEntries from 2
+2020/03/23 20:01:57   log matches at prevLogIndex
+2020/03/23 20:01:57 Server 1 appended entry 101 to log
+2020/03/23 20:01:57 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 20:01:57 Server 2 receives AppendEntries reply from 1
+2020/03/23 20:01:57 Server 0 receives AppendEntries from 2
+2020/03/23 20:01:57   log matches at prevLogIndex
+2020/03/23 20:01:57 Server 0 appended entry 101 to log
+2020/03/23 20:01:57 args.LeaderCommit = 0, rf.commitIndex = 0
+2020/03/23 20:01:57 Server 2 receives AppendEntries reply from 0
+2020/03/23 20:01:57 periodicHeartbeat acquires lock!
+2020/03/23 20:01:57 notifyApply <- 1
+2020/03/23 20:01:57 applyCommandRoutine executes
+2020/03/23 20:01:57 ++ Server 2's lastApply -> 1
+2020/03/23 20:01:57 Server 2 applyCh <- {index = 1, command = 101}
+2020/03/23 20:01:57 periodicHeartbeat acquires lock!
+2020/03/23 20:01:57 periodicHeartbeat acquires lock!
+2020/03/23 20:01:57 periodicHeartbeat acquires lock!
+2020/03/23 20:01:57 Server 1 receives heartbeat from 2
+2020/03/23 20:01:57   log matches at prevLogIndex
+2020/03/23 20:01:57 Server 0 receives heartbeat from 2
+2020/03/23 20:01:57   log matches at prevLogIndex
+2020/03/23 20:01:57 args.LeaderCommit = 1, rf.commitIndex = 0
+2020/03/23 20:01:57 + Server 0's commitIndex advanced!
+2020/03/23 20:01:57 notifyApply <- 1
+2020/03/23 20:01:57 args.LeaderCommit = 1, rf.commitIndex = 0
+2020/03/23 20:01:57 + Server 1's commitIndex advanced!
+2020/03/23 20:01:57 notifyApply <- 1
+2020/03/23 20:01:57 applyCommandRoutine executes
+2020/03/23 20:01:57 ++ Server 0's lastApply -> 1
+2020/03/23 20:01:57 Server 0 applyCh <- {index = 1, command = 101}
+2020/03/23 20:01:57 applyCommandRoutine executes
+2020/03/23 20:01:57 ++ Server 1's lastApply -> 1
+2020/03/23 20:01:57 Server 1 applyCh <- {index = 1, command = 101}
+2020/03/23 20:01:57 periodicHeartbeat acquires lock!
+2020/03/23 20:01:57 logReplication acquires lock!
+2020/03/23 20:01:57 periodicHeartbeat acquires lock!
+2020/03/23 20:01:57 periodicHeartbeat acquires lock!
+2020/03/23 20:01:57 Server 1 receives heartbeat from 2
+2020/03/23 20:01:57   log matches at prevLogIndex
+2020/03/23 20:01:57 args.LeaderCommit = 1, rf.commitIndex = 1
+2020/03/23 20:01:57 Server 0 receives heartbeat from 2
+2020/03/23 20:01:57   log matches at prevLogIndex
+2020/03/23 20:01:57 args.LeaderCommit = 1, rf.commitIndex = 1
+2020/03/23 20:01:57 periodicHeartbeat acquires lock!
+2020/03/23 20:01:57 periodicHeartbeat acquires lock!
+2020/03/23 20:01:57 periodicHeartbeat acquires lock!
+2020/03/23 20:01:57 Server 0 receives heartbeat from 2
+2020/03/23 20:01:57   log matches at prevLogIndex
+2020/03/23 20:01:57 args.LeaderCommit = 1, rf.commitIndex = 1
+2020/03/23 20:01:57 Server 1 receives heartbeat from 2
+2020/03/23 20:01:57   log matches at prevLogIndex
+2020/03/23 20:01:57 args.LeaderCommit = 1, rf.commitIndex = 1
+2020/03/23 20:01:57 periodicHeartbeat acquires lock!
+2020/03/23 20:01:57 logReplication acquires lock!
+2020/03/23 20:01:57 periodicHeartbeat acquires lock!
+2020/03/23 20:01:57 periodicHeartbeat acquires lock!
+2020/03/23 20:01:57 Server 1 receives heartbeat from 2
+2020/03/23 20:01:57   log matches at prevLogIndex
+2020/03/23 20:01:57 args.LeaderCommit = 1, rf.commitIndex = 1
+2020/03/23 20:01:57 Server 0 receives heartbeat from 2
+2020/03/23 20:01:57   log matches at prevLogIndex
+2020/03/23 20:01:57 args.LeaderCommit = 1, rf.commitIndex = 1
+2020/03/23 20:01:57 periodicHeartbeat acquires lock!
+2020/03/23 20:01:58 periodicHeartbeat acquires lock!
+2020/03/23 20:01:58 periodicHeartbeat acquires lock!
+2020/03/23 20:01:58 Server 1 receives heartbeat from 2
+2020/03/23 20:01:58   log matches at prevLogIndex
+2020/03/23 20:01:58 args.LeaderCommit = 1, rf.commitIndex = 1
+2020/03/23 20:01:58 Server 0 receives heartbeat from 2
+2020/03/23 20:01:58   log matches at prevLogIndex
+2020/03/23 20:01:58 args.LeaderCommit = 1, rf.commitIndex = 1
+2020/03/23 20:01:58 periodicHeartbeat acquires lock!
+2020/03/23 20:01:58 
+
+TESTACTION: Server 2 is the only leader
+2020/03/23 20:01:58 TESTACTION: Disconnects server 0 (non-leader)
+
+
+2020/03/23 20:01:58 Server 2 (leader) get new command. {index = 2, command = 102}
+2020/03/23 20:01:58 TESTACTION: 2 is leader, submit command
+2020/03/23 20:01:58 logReplication acquires lock!
+2020/03/23 20:01:58 logReplicationRoutine: send AppendEntries from 2 to 0
+2020/03/23 20:01:58 logReplicationRoutine: send AppendEntries from 2 to 1
+2020/03/23 20:01:58 Server 2 sends AppendEntries to 1 for log replication
+2020/03/23 20:01:58 Server 2 sends AppendEntries to 0 for log replication
+2020/03/23 20:01:58 Server 1 receives AppendEntries from 2
+2020/03/23 20:01:58   log matches at prevLogIndex
+2020/03/23 20:01:58 Server 1 appended entry 102 to log
+2020/03/23 20:01:58 args.LeaderCommit = 1, rf.commitIndex = 1
+2020/03/23 20:01:58 Server 2 receives AppendEntries reply from 1
+2020/03/23 20:01:58 notifyApply <- 1
+2020/03/23 20:01:58 applyCommandRoutine executes
+2020/03/23 20:01:58 ++ Server 2's lastApply -> 2
+2020/03/23 20:01:58 Server 2 applyCh <- {index = 2, command = 102}
+2020/03/23 20:01:58 periodicHeartbeat acquires lock!
+2020/03/23 20:01:58 periodicHeartbeat acquires lock!
+2020/03/23 20:01:58 periodicHeartbeat acquires lock!
+2020/03/23 20:01:58 periodicHeartbeat acquires lock!
+2020/03/23 20:01:58 Server 1 receives heartbeat from 2
+2020/03/23 20:01:58   log matches at prevLogIndex
+2020/03/23 20:01:58 args.LeaderCommit = 2, rf.commitIndex = 1
+2020/03/23 20:01:58 + Server 1's commitIndex advanced!
+2020/03/23 20:01:58 notifyApply <- 1
+2020/03/23 20:01:58 applyCommandRoutine executes
+2020/03/23 20:01:58 ++ Server 1's lastApply -> 2
+2020/03/23 20:01:58 Server 1 applyCh <- {index = 2, command = 102}
+2020/03/23 20:01:58 Server 2 (leader) get new command. {index = 3, command = 103}
+2020/03/23 20:01:58 TESTACTION: 2 is leader, submit command
+2020/03/23 20:01:58 periodicHeartbeat acquires lock!
+2020/03/23 20:01:58 logReplication acquires lock!
+2020/03/23 20:01:58 logReplicationRoutine: send AppendEntries from 2 to 0
+2020/03/23 20:01:58 logReplicationRoutine: send AppendEntries from 2 to 1
+2020/03/23 20:01:58 Server 2 sends AppendEntries to 1 for log replication
+2020/03/23 20:01:58 Server 2 sends AppendEntries to 0 for log replication
+2020/03/23 20:01:58 Server 1 receives AppendEntries from 2
+2020/03/23 20:01:58   log matches at prevLogIndex
+2020/03/23 20:01:58 Server 1 appended entry 103 to log
+2020/03/23 20:01:58 args.LeaderCommit = 2, rf.commitIndex = 2
+2020/03/23 20:01:58 Server 2 receives AppendEntries reply from 1
+2020/03/23 20:01:58 notifyApply <- 1
+2020/03/23 20:01:58 applyCommandRoutine executes
+2020/03/23 20:01:58 ++ Server 2's lastApply -> 3
+2020/03/23 20:01:58 Server 2 applyCh <- {index = 3, command = 103}
+2020/03/23 20:01:58 periodicHeartbeat acquires lock!
+2020/03/23 20:01:58 periodicHeartbeat acquires lock!
+2020/03/23 20:01:58 periodicHeartbeat acquires lock!
+2020/03/23 20:01:58 periodicHeartbeat acquires lock!
+2020/03/23 20:01:58 Server 1 receives heartbeat from 2
+2020/03/23 20:01:58   log matches at prevLogIndex
+2020/03/23 20:01:58 args.LeaderCommit = 3, rf.commitIndex = 2
+2020/03/23 20:01:58 + Server 1's commitIndex advanced!
+2020/03/23 20:01:58 notifyApply <- 1
+2020/03/23 20:01:58 applyCommandRoutine executes
+2020/03/23 20:01:58 ++ Server 1's lastApply -> 3
+2020/03/23 20:01:58 Server 1 applyCh <- {index = 3, command = 103}
+2020/03/23 20:01:58 periodicHeartbeat acquires lock!
+2020/03/23 20:01:58 logReplication acquires lock!
+2020/03/23 20:01:58 logReplicationRoutine: send AppendEntries from 2 to 0
+2020/03/23 20:01:58 Server 2 sends AppendEntries to 0 for log replication
+2020/03/23 20:01:58 periodicHeartbeat acquires lock!
+2020/03/23 20:01:58 Server 2 receives AppendEntries reply from 0
+2020/03/23 20:01:58 periodicHeartbeat acquires lock!
+2020/03/23 20:01:58 0 Becomes candidate at election timeout. rf.currentTerm: 2 -> 3 
+2020/03/23 20:01:58 periodicHeartbeat acquires lock!
+2020/03/23 20:01:58 periodicHeartbeat acquires lock!
+2020/03/23 20:01:58 Server 1 receives heartbeat from 2
+2020/03/23 20:01:58   log matches at prevLogIndex
+2020/03/23 20:01:58 args.LeaderCommit = 3, rf.commitIndex = 3
+2020/03/23 20:01:58 periodicHeartbeat acquires lock!
+2020/03/23 20:01:58 logReplication acquires lock!
+2020/03/23 20:01:58 logReplicationRoutine: send AppendEntries from 2 to 0
+2020/03/23 20:01:58 Server 2 sends AppendEntries to 0 for log replication
+2020/03/23 20:01:58 periodicHeartbeat acquires lock!
+2020/03/23 20:01:58 periodicHeartbeat acquires lock!
+2020/03/23 20:01:58 periodicHeartbeat acquires lock!
+2020/03/23 20:01:58 periodicHeartbeat acquires lock!
+2020/03/23 20:01:58 Server 1 receives heartbeat from 2
+2020/03/23 20:01:58   log matches at prevLogIndex
+2020/03/23 20:01:58 args.LeaderCommit = 3, rf.commitIndex = 3
+2020/03/23 20:01:58 periodicHeartbeat acquires lock!
+2020/03/23 20:01:58 logReplication acquires lock!
+2020/03/23 20:01:58 logReplicationRoutine: send AppendEntries from 2 to 0
+2020/03/23 20:01:58 Server 2 sends AppendEntries to 0 for log replication
+2020/03/23 20:01:58 periodicHeartbeat acquires lock!
+2020/03/23 20:01:58 periodicHeartbeat acquires lock!
+2020/03/23 20:01:59 periodicHeartbeat acquires lock!
+2020/03/23 20:01:59 periodicHeartbeat acquires lock!
+2020/03/23 20:01:59 Server 1 receives heartbeat from 2
+2020/03/23 20:01:59   log matches at prevLogIndex
+2020/03/23 20:01:59 args.LeaderCommit = 3, rf.commitIndex = 3
+2020/03/23 20:01:59 periodicHeartbeat acquires lock!
+2020/03/23 20:01:59 logReplication acquires lock!
+2020/03/23 20:01:59 logReplicationRoutine: send AppendEntries from 2 to 0
+2020/03/23 20:01:59 Server 2 sends AppendEntries to 0 for log replication
+2020/03/23 20:01:59 periodicHeartbeat acquires lock!
+2020/03/23 20:01:59 periodicHeartbeat acquires lock!
+2020/03/23 20:01:59 0 Becomes candidate at election timeout. rf.currentTerm: 3 -> 4 
+2020/03/23 20:01:59 periodicHeartbeat acquires lock!
+2020/03/23 20:01:59 periodicHeartbeat acquires lock!
+2020/03/23 20:01:59 Server 1 receives heartbeat from 2
+2020/03/23 20:01:59   log matches at prevLogIndex
+2020/03/23 20:01:59 args.LeaderCommit = 3, rf.commitIndex = 3
+2020/03/23 20:01:59 periodicHeartbeat acquires lock!
+2020/03/23 20:01:59 logReplication acquires lock!
+2020/03/23 20:01:59 logReplicationRoutine: send AppendEntries from 2 to 0
+2020/03/23 20:01:59 Server 2 sends AppendEntries to 0 for log replication
+2020/03/23 20:01:59 periodicHeartbeat acquires lock!
+2020/03/23 20:01:59 periodicHeartbeat acquires lock!
+2020/03/23 20:01:59 periodicHeartbeat acquires lock!
+2020/03/23 20:01:59 periodicHeartbeat acquires lock!
+2020/03/23 20:01:59 Server 1 receives heartbeat from 2
+2020/03/23 20:01:59   log matches at prevLogIndex
+2020/03/23 20:01:59 args.LeaderCommit = 3, rf.commitIndex = 3
+2020/03/23 20:01:59 Server 2 (leader) get new command. {index = 4, command = 104}
+2020/03/23 20:01:59 TESTACTION: 2 is leader, submit command
+2020/03/23 20:01:59 periodicHeartbeat acquires lock!
+2020/03/23 20:01:59 logReplication acquires lock!
+2020/03/23 20:01:59 logReplicationRoutine: send AppendEntries from 2 to 0
+2020/03/23 20:01:59 logReplicationRoutine: send AppendEntries from 2 to 1
+2020/03/23 20:01:59 Server 2 sends AppendEntries to 1 for log replication
+2020/03/23 20:01:59 Server 2 sends AppendEntries to 0 for log replication
+2020/03/23 20:01:59 Server 1 receives AppendEntries from 2
+2020/03/23 20:01:59   log matches at prevLogIndex
+2020/03/23 20:01:59 Server 1 appended entry 104 to log
+2020/03/23 20:01:59 args.LeaderCommit = 3, rf.commitIndex = 3
+2020/03/23 20:01:59 Server 2 receives AppendEntries reply from 1
+2020/03/23 20:01:59 notifyApply <- 1
+2020/03/23 20:01:59 applyCommandRoutine executes
+2020/03/23 20:01:59 ++ Server 2's lastApply -> 4
+2020/03/23 20:01:59 Server 2 applyCh <- {index = 4, command = 104}
+2020/03/23 20:01:59 periodicHeartbeat acquires lock!
+2020/03/23 20:01:59 periodicHeartbeat acquires lock!
+2020/03/23 20:01:59 periodicHeartbeat acquires lock!
+2020/03/23 20:01:59 periodicHeartbeat acquires lock!
+2020/03/23 20:01:59 Server 1 receives heartbeat from 2
+2020/03/23 20:01:59   log matches at prevLogIndex
+2020/03/23 20:01:59 args.LeaderCommit = 4, rf.commitIndex = 3
+2020/03/23 20:01:59 + Server 1's commitIndex advanced!
+2020/03/23 20:01:59 notifyApply <- 1
+2020/03/23 20:01:59 applyCommandRoutine executes
+2020/03/23 20:01:59 ++ Server 1's lastApply -> 4
+2020/03/23 20:01:59 Server 1 applyCh <- {index = 4, command = 104}
+2020/03/23 20:01:59 Server 2 (leader) get new command. {index = 5, command = 105}
+2020/03/23 20:01:59 TESTACTION: 2 is leader, submit command
+2020/03/23 20:01:59 periodicHeartbeat acquires lock!
+2020/03/23 20:01:59 logReplication acquires lock!
+2020/03/23 20:01:59 logReplicationRoutine: send AppendEntries from 2 to 0
+2020/03/23 20:01:59 logReplicationRoutine: send AppendEntries from 2 to 1
+2020/03/23 20:01:59 Server 2 sends AppendEntries to 1 for log replication
+2020/03/23 20:01:59 Server 2 sends AppendEntries to 0 for log replication
+2020/03/23 20:01:59 Server 1 receives AppendEntries from 2
+2020/03/23 20:01:59   log matches at prevLogIndex
+2020/03/23 20:01:59 Server 1 appended entry 105 to log
+2020/03/23 20:01:59 args.LeaderCommit = 4, rf.commitIndex = 4
+2020/03/23 20:01:59 Server 2 receives AppendEntries reply from 1
+2020/03/23 20:01:59 periodicHeartbeat acquires lock!
+2020/03/23 20:01:59 notifyApply <- 1
+2020/03/23 20:01:59 applyCommandRoutine executes
+2020/03/23 20:01:59 ++ Server 2's lastApply -> 5
+2020/03/23 20:01:59 Server 2 applyCh <- {index = 5, command = 105}
+2020/03/23 20:01:59 periodicHeartbeat acquires lock!
+2020/03/23 20:01:59 0 Becomes candidate at election timeout. rf.currentTerm: 4 -> 5 
+2020/03/23 20:01:59 periodicHeartbeat acquires lock!
+2020/03/23 20:01:59 periodicHeartbeat acquires lock!
+2020/03/23 20:01:59 Server 1 receives heartbeat from 2
+2020/03/23 20:01:59   log matches at prevLogIndex
+2020/03/23 20:01:59 args.LeaderCommit = 5, rf.commitIndex = 4
+2020/03/23 20:01:59 + Server 1's commitIndex advanced!
+2020/03/23 20:01:59 notifyApply <- 1
+2020/03/23 20:01:59 applyCommandRoutine executes
+2020/03/23 20:01:59 ++ Server 1's lastApply -> 5
+2020/03/23 20:01:59 Server 1 applyCh <- {index = 5, command = 105}
+2020/03/23 20:01:59 
+
+TESTACTION: server 0 (non-leader) rejoins
+
+2020/03/23 20:01:59 Server 2 (leader) get new command. {index = 6, command = 106}
+2020/03/23 20:01:59 TESTACTION: 2 is leader, submit command
+2020/03/23 20:01:59 periodicHeartbeat acquires lock!
+2020/03/23 20:01:59 logReplication acquires lock!
+2020/03/23 20:01:59 logReplicationRoutine: send AppendEntries from 2 to 0
+2020/03/23 20:01:59 logReplicationRoutine: send AppendEntries from 2 to 1
+2020/03/23 20:01:59 Server 2 sends AppendEntries to 1 for log replication
+2020/03/23 20:01:59 Server 2 sends AppendEntries to 0 for log replication
+2020/03/23 20:01:59 Server 0 receives AppendEntries from 2
+2020/03/23 20:01:59   args.prevLogIndex = 1. args.term = 2, rf.currentTerm = 5. Reply FALSE as leader is out of term
+2020/03/23 20:01:59 Server 1 receives AppendEntries from 2
+2020/03/23 20:01:59   log matches at prevLogIndex
+2020/03/23 20:01:59 Server 1 appended entry 106 to log
+2020/03/23 20:01:59 args.LeaderCommit = 5, rf.commitIndex = 5
+2020/03/23 20:01:59 Server 2 receives AppendEntries reply from 0
+2020/03/23 20:01:59 2 Becomes follower as being out of term!  rf.currentTerm: 2 -> 5
+2020/03/23 20:01:59 Server 2 receives AppendEntries reply from 1
+2020/03/23 20:01:59 periodicHeartbeat acquires lock!
+2020/03/23 20:01:59 Server 2's periodicHeartbeat returns!
+2020/03/23 20:02:00 logReplication acquires lock!
+2020/03/23 20:02:00 Server 2's logReplicationRoutine returns!
+2020/03/23 20:02:00 1 Becomes candidate at election timeout. rf.currentTerm: 2 -> 3 
+2020/03/23 20:02:00 0 Becomes candidate at election timeout. rf.currentTerm: 5 -> 6 
+2020/03/23 20:02:00 1 Becomes follower as being out of term!  rf.currentTerm: 3 -> 6
+2020/03/23 20:02:00 2 Becomes follower as being out of term!  rf.currentTerm: 5 -> 6
+2020/03/23 20:02:00 Server 2 receives AppendEntries reply from 0
+2020/03/23 20:02:00 0 Becomes candidate at election timeout. rf.currentTerm: 6 -> 7 
+2020/03/23 20:02:00 1 Becomes follower as being out of term!  rf.currentTerm: 6 -> 7
+2020/03/23 20:02:00 2 Becomes follower as being out of term!  rf.currentTerm: 6 -> 7
+2020/03/23 20:02:01 Server 2 receives AppendEntries reply from 0
+2020/03/23 20:02:01 2 Becomes candidate at election timeout. rf.currentTerm: 7 -> 8 
+2020/03/23 20:02:01 0 Becomes follower as being out of term!  rf.currentTerm: 7 -> 8
+2020/03/23 20:02:01 1 Becomes follower as being out of term!  rf.currentTerm: 7 -> 8
+2020/03/23 20:02:01 
+
+2 Becomes leader!
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Up to this point, everything works fine. The problem appears below.
+As in heartbeat_LogReplication_separate.old, we use separate routines for
+generating heartbeats and sending normal AppendEntries for log replication.
+As we are resetting prevCommTime when sending AppendEntries and prevCommTime is
+also used as a check in periodicHeartbeat.
+
+The problem is:
+A server is disconnected. On receiving negative reply, logReplicationRoutine would
+retry AppendEntries. However, how soon we retry is a problem.
+In logReplicationRoutine(), if the loop is too tight, then periodicHeartbeat() would
+not be able to acquire the lock. Even if it does, it's very likely to discover that
+it has just send AppendEntries and would not send heartbeat. In this way, heartbeat
+is never send and the leader. So the leader should sleep for some time after each
+round of logReplicationRoutine() finishes.
+
+At this point, leader's nextIndex[] is reinitialized to be lastLogIndex+1. 
+According to rules for leader, it would not try to send AppendEntries to followers 
+until receiving new request from client, because only then the condition 
+(last log index >= nextIndex) becomes true.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+2020/03/23 20:02:01 periodicHeartbeat acquires lock!
+2020/03/23 20:02:01 periodicHeartbeat acquires lock!
+2020/03/23 20:02:01 Server 1 receives heartbeat from 2
+2020/03/23 20:02:01   log matches at prevLogIndex
+2020/03/23 20:02:01 args.LeaderCommit = 5, rf.commitIndex = 5
+2020/03/23 20:02:01 logReplication acquires lock!
+2020/03/23 20:02:01 Server 0 receives heartbeat from 2
+2020/03/23 20:02:01   args.prevLogIndex = 6. Reply FALSE as its log does not contain entry at prevLogIndex with prevLogTerm
+2020/03/23 20:02:01 periodicHeartbeat acquires lock!
+2020/03/23 20:02:01 periodicHeartbeat acquires lock!
+2020/03/23 20:02:01 periodicHeartbeat acquires lock!
+2020/03/23 20:02:01 Server 1 receives heartbeat from 2
+2020/03/23 20:02:01 Server 0 receives heartbeat from 2
+2020/03/23 20:02:01   args.prevLogIndex = 6. Reply FALSE as its log does not contain entry at prevLogIndex with prevLogTerm
+2020/03/23 20:02:01   log matches at prevLogIndex
+2020/03/23 20:02:01 args.LeaderCommit = 5, rf.commitIndex = 5
+2020/03/23 20:02:01 periodicHeartbeat acquires lock!
+2020/03/23 20:02:01 logReplication acquires lock!
+2020/03/23 20:02:01 periodicHeartbeat acquires lock!
+2020/03/23 20:02:01 periodicHeartbeat acquires lock!
+2020/03/23 20:02:01 Server 0 receives heartbeat from 2
+2020/03/23 20:02:01   args.prevLogIndex = 6. Reply FALSE as its log does not contain entry at prevLogIndex with prevLogTerm
+2020/03/23 20:02:01 Server 1 receives heartbeat from 2
+2020/03/23 20:02:01   log matches at prevLogIndex
+2020/03/23 20:02:01 args.LeaderCommit = 5, rf.commitIndex = 5
+2020/03/23 20:02:01 periodicHeartbeat acquires lock!
+2020/03/23 20:02:01 periodicHeartbeat acquires lock!
+2020/03/23 20:02:01 periodicHeartbeat acquires lock!
+2020/03/23 20:02:01 Server 0 receives heartbeat from 2
+2020/03/23 20:02:01   args.prevLogIndex = 6. Reply FALSE as its log does not contain entry at prevLogIndex with prevLogTerm
+2020/03/23 20:02:01 Server 1 receives heartbeat from 2
+2020/03/23 20:02:01   log matches at prevLogIndex
+2020/03/23 20:02:01 args.LeaderCommit = 5, rf.commitIndex = 5
+2020/03/23 20:02:01 periodicHeartbeat acquires lock!
+2020/03/23 20:02:01 logReplication acquires lock!
+2020/03/23 20:02:01 periodicHeartbeat acquires lock!
+2020/03/23 20:02:01 periodicHeartbeat acquires lock!
+
+2020/03/23 20:02:01 Server 2 (leader) get new command. {index = 6, command = 106}
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Leader receives new command again. Now the condition (last log index >= nextIndex) 
+is true and logReplicationRoutine() would send out AppendEntries again to 
+replicate logs.
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+2020/03/23 20:02:01 TESTACTION: 2 is leader, submit command
+2020/03/23 20:02:01 Server 0 receives heartbeat from 2
+2020/03/23 20:02:01   args.prevLogIndex = 6. Reply FALSE as its log does not contain entry at prevLogIndex with prevLogTerm
+2020/03/23 20:02:01 Server 1 receives heartbeat from 2
+2020/03/23 20:02:01   log matches at prevLogIndex
+2020/03/23 20:02:01 args.LeaderCommit = 5, rf.commitIndex = 5
+2020/03/23 20:02:01 periodicHeartbeat acquires lock!
+2020/03/23 20:02:01 periodicHeartbeat acquires lock!
+2020/03/23 20:02:01 periodicHeartbeat acquires lock!
+2020/03/23 20:02:01 Server 1 receives heartbeat from 2
+2020/03/23 20:02:01   log matches at prevLogIndex
+2020/03/23 20:02:01 args.LeaderCommit = 5, rf.commitIndex = 5
+2020/03/23 20:02:01 Server 0 receives heartbeat from 2
+2020/03/23 20:02:01   args.prevLogIndex = 6. Reply FALSE as its log does not contain entry at prevLogIndex with prevLogTerm
+2020/03/23 20:02:02 periodicHeartbeat acquires lock!
+2020/03/23 20:02:02 logReplication acquires lock!
+
+2020/03/23 20:02:02 logReplicationRoutine: send AppendEntries from 2 to 0
+2020/03/23 20:02:02 logReplicationRoutine: send AppendEntries from 2 to 1
+2020/03/23 20:02:02 Server 2 sends AppendEntries to 1 for log replication
+2020/03/23 20:02:02 Server 2 sends AppendEntries to 0 for log replication
+2020/03/23 20:02:02 Server 1 receives AppendEntries from 2
+2020/03/23 20:02:02   log matches at prevLogIndex
+2020/03/23 20:02:02 Server 1 appended entry 106 to log
+2020/03/23 20:02:02 args.LeaderCommit = 5, rf.commitIndex = 5
+2020/03/23 20:02:02 Server 0 receives AppendEntries from 2
+2020/03/23 20:02:02   args.prevLogIndex = 6. Reply FALSE as its log does not contain entry at prevLogIndex with prevLogTerm
+2020/03/23 20:02:02 Server 2 receives AppendEntries reply from 1
+2020/03/23 20:02:02 Server 2 receives AppendEntries reply from 0
+2020/03/23 20:02:02 0 Becomes candidate at election timeout. rf.currentTerm: 8 -> 9 
+2020/03/23 20:02:02 notifyApply <- 1
+2020/03/23 20:02:02 applyCommandRoutine executes
+2020/03/23 20:02:02 ++ Server 2's lastApply -> 6
+2020/03/23 20:02:02 Server 2 applyCh <- {index = 7, command = 106}
+2020/03/23 20:02:02 ++ Server 2's lastApply -> 7
+2020/03/23 20:02:02 apply error: server 2 apply out of order 7
+exit status 1
+FAIL	_/mnt/c/Users/musicman/Desktop/MIT6.824/lab/src/raft	5.300s
+Error: Tests failed.
