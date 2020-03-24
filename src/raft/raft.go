@@ -18,12 +18,14 @@ package raft
 //
 
 import (
+	"bytes"
 	"fmt"
 	"math/rand"
 	"sync"
 	"sync/atomic"
 	"time"
 
+	"../labgob"
 	"../labrpc"
 )
 
@@ -139,6 +141,7 @@ func (rf *Raft) GetState() (int, bool) {
 // where it can later be retrieved after a crash and restart.
 // see paper's Figure 2 for a description of what should be persistent.
 //
+// The caller of persist() should hold the lock
 func (rf *Raft) persist() {
 	// Your code here (2C).
 	// Example:
@@ -148,6 +151,14 @@ func (rf *Raft) persist() {
 	// e.Encode(rf.yyy)
 	// data := w.Bytes()
 	// rf.persister.SaveRaftState(data)
+	DPrintf("[%v].persist()", rf.me)
+	writeBuffer := new(bytes.Buffer)
+	encoder := labgob.NewEncoder(writeBuffer)
+	encoder.Encode(rf.currentTerm)
+	encoder.Encode(rf.votedFor)
+	encoder.Encode(rf.log)
+	data := writeBuffer.Bytes()
+	rf.persister.SaveRaftState(data)
 }
 
 //
@@ -170,6 +181,21 @@ func (rf *Raft) readPersist(data []byte) {
 	//   rf.xxx = xxx
 	//   rf.yyy = yyy
 	// }
+
+	readBuffer := bytes.NewBuffer(data)
+	decoder := labgob.NewDecoder(readBuffer)
+	var readCurrentTerm int
+	var readVotedFor int
+	var readLog []LogEntry
+	if decoder.Decode(&readCurrentTerm) != nil ||
+		decoder.Decode(&readVotedFor) != nil ||
+		decoder.Decode(&readLog) != nil {
+		DPrintf("readPersists error!")
+	} else {
+		rf.currentTerm = readCurrentTerm
+		rf.votedFor = readVotedFor
+		rf.log = readLog
+	}
 }
 
 //
@@ -241,6 +267,9 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 
 			// Update election timeout only if granting vote
 			rf.resetElectionTimer()
+
+			// persist state, rf.votedFor changed
+			rf.persist()
 		} else { // Without this else branch, zero-value is used in reply
 			reply.Term = rf.currentTerm
 			reply.VoteGranted = false
@@ -314,12 +343,12 @@ type AppendEntriesReply struct {
 }
 
 // Must be called when lock is held by the caller
-func (rf *Raft) printLog() {
+func (rf *Raft) logString() string {
 	logStr := fmt.Sprintf("[%v]: ", rf.me)
 	for _, entry := range rf.log {
 		logStr += fmt.Sprintf("{%v} ", entry.Command)
 	}
-	DPrintf(logStr)
+	return logStr
 }
 
 //
@@ -397,6 +426,10 @@ func (rf *Raft) AppendEntries(args *AppendEntriesArgs, reply *AppendEntriesReply
 		}
 		reply.Term = rf.currentTerm
 		reply.Success = true
+
+		// persist state, as rf.votedFor, rf.log changed
+		rf.persist()
+
 		rf.mu.Unlock()
 
 		// Possible change to rf.commitIndex
@@ -421,7 +454,7 @@ func (rf *Raft) applyCommandRoutine() {
 		for currCommitIndex > rf.lastApplied {
 			// Increment lastApplied
 			rf.lastApplied++
-			DPrintf("++ [%v]'s lastApply -> %v", rf.me, rf.lastApplied)
+			DPrintf("++ [%v]'s lastApplied -> %v", rf.me, rf.lastApplied)
 
 			// Apply log[lastApplied] to state machine
 			// The instruction is not very clear. The testing framework
@@ -477,6 +510,9 @@ func (rf *Raft) Start(command interface{}) (int, int, bool) {
 		logEntry := LogEntry{Command: command, ReceivedTerm: rf.currentTerm}
 		rf.log = append(rf.log, logEntry)
 
+		// Persist state, as rf.log changed
+		rf.persist()
+
 		// Respond after entry applied to state machine done, done in applyCommandRoutine
 	}
 	// index: the index that the command will appear at if it's ever committed
@@ -507,6 +543,9 @@ func (rf *Raft) electionTimeoutRoutine() {
 			rf.votesReceived = 1 // 2. Vote for self
 			rf.votedFor = rf.me
 			rf.resetElectionTimer() // 3. Reset election timer
+
+			// persist state, as rf.votedFor, rf.currentTerm changed
+			rf.persist()
 
 			/// Check voteCountImplementation.txt for more detail ///
 			for i := 0; i < len(rf.peers); i++ {
@@ -601,15 +640,13 @@ func (rf *Raft) logReplicationRoutine() {
 			prevLogTerm := rf.log[prevLogIndex].ReceivedTerm
 			entries := rf.log[rf.nextIndex[i]:]
 			// DPrintf("logReplicationRoutine: send AppendEntries from %v to %v", rf.me, i)
-			go rf.sendAppendEntriesAndHandleReply(i, rf.currentTerm,
-				rf.me, prevLogIndex, prevLogTerm, entries, rf.commitIndex)
+			go rf.sendAppendEntriesAndHandleReply(i, rf.currentTerm, rf.me, prevLogIndex, prevLogTerm, entries, rf.commitIndex)
 
 			rf.prevAppendEntriesTime = time.Now()
 		}
 
 		rf.mu.Unlock()
 		time.Sleep(rf.heartbeatInterval + time.Duration(4*sleepUnit)*time.Millisecond)
-		// time.Sleep(6 * rf.heartbeatInterval / 5)
 		// Sleep long enough to allow heartbeat happens.
 		// Otherwise, if a follower crashes and leader doesn't receive a reply,
 		// it retries too soon and heartbeat is not allowed to happen.
@@ -686,7 +723,6 @@ func (rf *Raft) periodicHeartbeatRoutine() {
 	DPrintf("[%v]'s periodicHeartbeat called!", rf.me)
 	for {
 		rf.mu.Lock()
-		// DPrintf("periodicHeartbeat acquires lock!")
 
 		notLeader := rf.serverState != leader
 		tooSoon := time.Now().Before(rf.prevAppendEntriesTime.Add(rf.heartbeatInterval))
@@ -710,26 +746,7 @@ func (rf *Raft) periodicHeartbeatRoutine() {
 				prevLogTerm := rf.log[prevLogIndex].ReceivedTerm
 
 				// DPrintf("[%v] tries to send heartbeat to [%v]", rf.me, i)
-				go func(server int, currentTerm int, me int, commitIndex int, prevLogIndex int, prevLogTerm int) {
-					args := AppendEntriesArgs{
-						Term:         currentTerm,
-						LeaderID:     me,
-						Entries:      make([]LogEntry, 0),
-						LeaderCommit: commitIndex,
-
-						// PrevLogIndex and PrevLogTerm are set in the same way as normal AppendEntries
-						PrevLogIndex: prevLogIndex,
-						PrevLogTerm:  prevLogTerm,
-					}
-					reply := AppendEntriesReply{}
-					ok := rf.sendAppendEntries(server, &args, &reply)
-
-					if ok {
-						rf.mu.Lock()
-						rf.becomesFollowerIfOutOfTerm(reply.Term)
-						rf.mu.Unlock()
-					}
-				}(i, rf.currentTerm, rf.me, rf.commitIndex, prevLogIndex, prevLogTerm)
+				go rf.sendAppendEntriesAndHandleReply(i, rf.currentTerm, rf.me, prevLogIndex, prevLogTerm, make([]LogEntry, 0), rf.commitIndex)
 			}
 			rf.prevAppendEntriesTime = time.Now()
 
@@ -754,6 +771,9 @@ func (rf *Raft) becomesFollowerIfOutOfTerm(replyOrResponseTerm int) {
 		rf.votedFor = -1
 		rf.votesReceived = 0
 		rf.resetElectionTimer()
+
+		// persist state, as rf.votedFor and rf.currentTerm changed
+		rf.persist()
 	}
 }
 
@@ -799,7 +819,6 @@ func Make(peers []*labrpc.ClientEnd, me int,
 	// Your initialization code here (2A, 2B, 2C).
 	rf.applyCh = applyCh
 	rf.serverState = follower // A server starts up as a follower
-	// DPrintf("[%v] Starts out as follower! ", rf.me)
 
 	rf.numServers = len(rf.peers)
 	rf.minMajority = (rf.numServers / 2) + 1
@@ -831,6 +850,10 @@ func Make(peers []*labrpc.ClientEnd, me int,
 
 	// initialize from state persisted before a crash
 	rf.readPersist(persister.ReadRaftState())
+	DPrintf("[%v] Started! Read following from persist: ", rf.me)
+	DPrintf("\tcurrentTerm: %v", rf.currentTerm)
+	DPrintf("\tvotedFor: %v", rf.votedFor)
+	DPrintf("\tlog: %v", rf.logString())
 
 	// Create a background go routine to start leader election periodically by
 	// sending out RequestVote RPCs if it hasn't heard from others for a while.
